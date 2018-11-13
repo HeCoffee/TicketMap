@@ -24,14 +24,14 @@
 
 核心代码如下，详细代码看index
 #### html
-```
+```` html
 <div>
     <svg>....</svg>
 </div>
-```
+````
 
 #### js
-```
+```` javascript
   var svgTarget = document.querySelector('svg')
   var svgHtml = document.querySelector('.svg-html')
 
@@ -94,4 +94,4 @@
     transform.translateX += e.deltaX
     console.log(e.deltaY, e.deltaX, transform.translateX, transform.translateY)
   })
-```
+````
