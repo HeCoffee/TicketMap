@@ -109,6 +109,8 @@ svgHam.on('pinchstart pinchmove', (e) => {
 ```
 设置maxScale，minScale以免无限大或者无限小
 
+**· 注意这里缩放的是box而不是svg本身，否则拖动后再缩放就会发现整个SVG都跑偏了**
+
 ### 拖动事件
 
 
