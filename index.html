@@ -36,9 +36,16 @@
   <script>
     // 记录位移变量
     var transform = {
-      translateX: 0,
-      translateY: 0,
-      scale: 0.5
+      svgScale: 0.5, // svg 默认缩放
+      scale: 1, // svg-box 缩放
+      maxScale: 7, // svg-box 最大缩放
+      minScale: 1,  // svg-box 最小缩放
+      translateX: 0, // svg X轴偏移
+      translateY: 0, // svg Y轴偏移
+      minX: 0, // svg 最小X轴偏移
+      maxX: 0, // svg 最大X轴偏移
+      minY: 0, // svg 最小Y轴偏移
+      maxY: 0  // svg 最大Y轴偏移
     }
 
     document.querySelector('.svg-html').addEventListener('click', selectSeat)
@@ -49,6 +56,7 @@
     function selectSeat (e) {
       if (e.target.tagName !== 'circle') return false
       e.target.style.fill = e.target.style.fill === 'red' ? '#ccc' : 'red'
+      // do something...
     }
 
     // 初始化
@@ -57,7 +65,13 @@
       var svgHtml = document.querySelector('.svg-html')
       transform.translateX = Math.round((svgHtml.clientWidth - svgTarget.clientWidth) / 2)
       transform.translateY = Math.round((svgHtml.clientHeight - svgTarget.clientHeight) / 2)
-      var defaultTransform = `translate(${transform.translateX}px, ${transform.translateY}px) scale(${transform.scale})`
+
+      transform.minX = transform.translateX - svgHtml.clientWidth / 4
+      transform.maxX = transform.translateX + svgHtml.clientWidth / 4
+      transform.minY = transform.translateY - svgHtml.clientHeight / 2.5
+      transform.maxY = transform.translateY + svgHtml.clientHeight / 2.5
+
+      var defaultTransform = `translate(${transform.translateX}px, ${transform.translateY}px) scale(${transform.svgScale})`
       svgTarget.style.transform = defaultTransform
       var svgHam = new Hammer(svgHtml)
       svgHam.get('pinch').set({ enable: true })
@@ -65,45 +79,33 @@
       // svgHam.add(new Hammer.Pan({ threshold: 0, pointers: 0 }))
       svgHam.get('pan').set({ direction: Hammer.DIRECTION_ALL })
       svgHam.on('pinchstart pinchmove', (e) => {
-        var { scale, translateX, translateY } = transform
+        var { scale, maxScale, minScale } = transform
         scale *= e.scale
-        scale = scale >= 4.5 ? 4.5 : scale
-        scale = scale <= 0.5 ? 0.5 : scale
+        scale = scale >= maxScale ? maxScale : scale
+        scale = scale <= minScale ? minScale : scale
         transform.scale = scale
-        svgTarget.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
-      })
-      svgHam.on('pinchend', (e) => {
-        if (transform.scale > 1.5) return false
-        transform.scale = 0.5
-        transform.translateX = Math.round((svgHtml.clientWidth - svgTarget.clientWidth) / 2)
-        transform.translateY = Math.round((svgHtml.clientHeight - svgTarget.clientHeight) / 2)
-        svgTarget.style.transform = defaultTransform
-      })
-      //  PC端无法模拟 捏放手势 用 双击代替
-      svgHam.on('doubletap', (e) => {
-        var { scale, translateX, translateY } = transform
-        if (scale < 1.5) {
-          scale = 1.5
-          transform.scale = scale
-          svgTarget.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`
-        } else {
-          transform.scale = 0.5
-          transform.translateX = Math.round((svgHtml.clientWidth - svgTarget.clientWidth) / 2)
-          transform.translateY = Math.round((svgHtml.clientHeight - svgTarget.clientHeight) / 2)
-          svgTarget.style.transform = defaultTransform
-        }
+        svgHtml.style.transform = `scale(${scale})`
       })
       svgHam.on('panstart panmove', (e) => {
-        var { scale, translateX, translateY } = transform
-        if (scale < 1) return false
-        var y = translateY + e.deltaY
-        var x = translateX + e.deltaX
-        svgTarget.style.transform = `translate(${x}px, ${y}px) scale(${scale})`
+        let { scale, translateX, translateY, minX, minY, maxX, maxY, svgScale } = transform
+        let y = translateY + e.deltaY / scale
+        let x = translateX + e.deltaX / scale
+        x = x > maxX ? maxX : x
+        x = x < minX ? minX : x
+        y = y > maxY ? maxY : y
+        y = y < minY ? minY : y
+        svgTarget.style.transform = `translate(${x}px, ${y}px) scale(${svgScale})`
       })
       svgHam.on('panend', (e) => {
-        if (transform.scale < 1) return false
-        transform.translateY += e.deltaY
-        transform.translateX += e.deltaX
+        let { scale, translateX, translateY, minX, minY, maxX, maxY } = transform
+        let y = translateY + e.deltaY / scale
+        let x = translateX + e.deltaX / scale
+        x = x > maxX ? maxX : x
+        x = x < minX ? minX : x
+        y = y > maxY ? maxY : y
+        y = y < minY ? minY : y
+        transform.translateY = y
+        transform.translateX = x
         console.log(e.deltaY, e.deltaX, transform.translateX, transform.translateY)
       })
     }
