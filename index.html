@@ -25,7 +25,7 @@
       fill: #ccc;
     }
   </style>
-  <script src="http://hammerjs.github.io/dist/hammer.js"></script>
+  <script src="https://hammerjs.github.io/dist/hammer.js"></script>
 </head>
 <body>
   <div class="ticket-map-body">
@@ -78,6 +78,7 @@
       // svgHam.add(new Hammer.Pinch({ threshold: 0 }))
       // svgHam.add(new Hammer.Pan({ threshold: 0, pointers: 0 }))
       svgHam.get('pan').set({ direction: Hammer.DIRECTION_ALL })
+
       svgHam.on('pinchstart pinchmove', (e) => {
         var { scale, maxScale, minScale } = transform
         scale *= e.scale
@@ -86,6 +87,7 @@
         transform.scale = scale
         svgHtml.style.transform = `scale(${scale})`
       })
+
       svgHam.on('panstart panmove', (e) => {
         let { scale, translateX, translateY, minX, minY, maxX, maxY, svgScale } = transform
         let y = translateY + e.deltaY / scale
@@ -96,6 +98,7 @@
         y = y < minY ? minY : y
         svgTarget.style.transform = `translate(${x}px, ${y}px) scale(${svgScale})`
       })
+
       svgHam.on('panend', (e) => {
         let { scale, translateX, translateY, minX, minY, maxX, maxY } = transform
         let y = translateY + e.deltaY / scale
