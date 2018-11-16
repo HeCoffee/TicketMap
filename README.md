@@ -16,7 +16,7 @@
 
 ![拖动](https://user-gold-cdn.xitu.io/2018/11/15/16716a607cf8620f?w=263&h=278&f=gif&s=2077812)
 
-详细效果可以去[demo](https://hecoffee.github.io/TicketMap/)那体验一下
+详细效果可以去[demo](https://hecoffee.github.io/TicketMap/)那体验一下，建议用手机端体验。
 
 ## svg
 座位分布图的SVG是UI画好后导出来，并且通过后端接口返回整个SVG标签以及里面的内容。
